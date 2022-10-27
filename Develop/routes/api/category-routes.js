@@ -48,13 +48,30 @@ router.post('/', (req, res) => {
     category_name: req.body.category_name,
   }).then(results=> 
     res.json(results)).catch((err)=> {
-       res.status(500).json(err);
-      throw(err)})
+      res.status(500).json(err);
+     throw(err)})
   // create a new category
 });
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
+  Category.update(
+    {
+      category_name: req.body.category_name
+    },
+    {
+      where:{
+        id:req.params.id
+      }
+    }
+  ).then(results=>{
+    if (!results){
+      res.status(404).json({message: "no matching ID found"});
+      return;
+    } else (res.json(results))
+  }).catch((err)=> {
+    res.status(500).json(err);
+   throw(err)})
 });
 
 router.delete('/:id', (req, res) => {
