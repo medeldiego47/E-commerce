@@ -27,6 +27,26 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
+  Product.findOne({
+    where:{
+      id:req.params.id
+    },
+    attributes:['id','product_name','price'],
+    include :[
+     { model: Category,
+      attributes:['id','category_name']
+  }],
+  include:[{ model:Tag,
+    attributes:['id','tag_name']}]
+  }).then(result=>{
+    if (!result){
+      res.status(404).json({message: `id does not match any product`});
+      return;
+    } else {res.json(result)};
+  }).catch((err)=> {
+    res.status(500).json(err);
+    throw(err)
+  })
 });
 
 // create new product
@@ -105,6 +125,16 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  Product.destroy({
+    where: {
+      id: req.params.id
+    }
+  }).then(results=> {
+    if (!results){res.status(404).json({message:"no matching ID found"});
+  return;} else (res.json(results))
+  }).catch((err)=> {
+    res.status(500).json(err);
+   throw(err)})
 });
 
 module.exports = router;
